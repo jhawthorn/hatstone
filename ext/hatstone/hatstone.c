@@ -59,7 +59,7 @@ hatstone_disasm(VALUE self, VALUE code_str, VALUE addr)
     return list;
 }
 
-void Init_hatstone()
+void Init_hatstone(void)
 {
     VALUE klass = rb_define_class("Hatstone", rb_cObject);
     rb_undef_alloc_func(klass);
