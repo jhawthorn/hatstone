@@ -49,3 +49,5 @@ Rake::ExtensionTask.new("hatstone")
 
 task :compile => :gen_enums
 task :test => :compile
+
+task default: :test
