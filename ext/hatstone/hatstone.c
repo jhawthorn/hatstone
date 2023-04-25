@@ -83,7 +83,7 @@ void Init_hatstone(void)
     setup.realloc = xrealloc;
     setup.free = xfree;
     setup.vsnprintf = ruby_vsnprintf;
-    cs_err err = cs_option(0, CS_OPT_MEM, &setup);
+    cs_err err = cs_option(0, CS_OPT_MEM, (size_t)&setup);
     if (err != CS_ERR_OK) {
         raise_cs_err(err, "CS_OPT_MEM");
     }
