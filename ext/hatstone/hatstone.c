@@ -77,5 +77,17 @@ void Init_hatstone(void)
 
     cInsn = rb_struct_define_under(klass, "Insn", "id", "address", "size", "bytes", "mnemonic", "op_str", NULL);
 
+    cs_opt_mem setup;
+    setup.malloc = xmalloc;
+    setup.calloc = xcalloc;
+    setup.realloc = xrealloc;
+    setup.free = xfree;
+    setup.vsnprintf = ruby_vsnprintf;
+    cs_err err = cs_option(0, CS_OPT_MEM, &setup);
+    if (err != CS_ERR_OK) {
+        raise_cs_err(err, "CS_OPT_MEM");
+    }
+
+
 #include "hatstone_enums.inc"
 }

@@ -1,23 +1,27 @@
-$LDFLAGS = RbConfig::CONFIG["LDFLAGS"] = "-L."
-
 require 'mkmf'
 
-ldflags = cppflags = nil
+$VPATH << "$(srcdir)/capstone"
+Dir.chdir(__dir__) do
+  $srcs = []
+  $srcs.concat Dir['capstone/*.c'].sort
 
-begin
-  brew_prefix = `brew --prefix hidapi`.chomp
-  ldflags   = "#{brew_prefix}/lib"
-  cppflags  = "#{brew_prefix}/include"
-  pkg_conf  = "#{brew_prefix}/lib/pkgconfig"
+  architectures = Dir.glob("capstone/arch/**").map { |x| File.basename(x) }
+  architectures.each do |arch|
+    $VPATH << "$(srcdir)/capstone/arch/#{arch}"
+    $srcs.concat Dir["capstone/arch/#{arch}/**/*.c"].sort
+  end
 
-  ENV["PKG_CONFIG_PATH"] = pkg_conf
-rescue
+  $srcs.map! { |n| File.basename(n) }
 end
 
-pkg_config "capstone"
-dir_config "capstone", cppflags, ldflags
+$srcs << "hatstone.c"
 
-raise "Install capstone!" unless have_header "capstone.h"
-raise "Install capstone!" unless have_library "capstone"
+append_cppflags("-I$(srcdir)/capstone/include")
+append_cppflags("-I$(srcdir)/capstone/include/capstone")
+
+append_cppflags("-D CAPSTONE_HAS_ARM")
+append_cppflags("-D CAPSTONE_HAS_ARM64")
+append_cppflags("-D CAPSTONE_HAS_X86")
+append_cppflags("-D CAPSTONE_DIET_NO")
 
 create_makefile('hatstone')
