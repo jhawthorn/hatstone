@@ -2,6 +2,7 @@
 #include <capstone.h>
 
 static VALUE cInsn;
+static VALUE eHatstoneError;
 
 static void dealloc(void * ptr)
 {
@@ -18,14 +19,20 @@ static const rb_data_type_t handle_type = {
 #endif
 };
 
+static void raise_cs_err(cs_err err, const char *name) {
+    rb_raise(eHatstoneError, "%s: %s", name, cs_strerror(err));
+}
+
 static VALUE
 hatstone_open(VALUE klass, VALUE arch, VALUE mode)
 {
     csh * handle = calloc(sizeof(csh), 1);
 
-    if (CS_ERR_OK == cs_open(NUM2INT(arch), NUM2INT(mode), handle)) {
+    cs_err ret = cs_open(NUM2INT(arch), NUM2INT(mode), handle);
+    if (CS_ERR_OK == ret) {
 	return TypedData_Wrap_Struct(klass, &handle_type, handle);
     } else {
+        raise_cs_err(ret, "cs_open");
         return Qnil;
     }
 }
@@ -65,6 +72,8 @@ void Init_hatstone(void)
     rb_undef_alloc_func(klass);
     rb_define_singleton_method(klass, "new", hatstone_open, 2);
     rb_define_method(klass, "disasm", hatstone_disasm, 2);
+
+    eHatstoneError = rb_define_class_under(klass, "Error", rb_eStandardError);;
 
     cInsn = rb_struct_define_under(klass, "Insn", "id", "address", "size", "bytes", "mnemonic", "op_str", NULL);
 
