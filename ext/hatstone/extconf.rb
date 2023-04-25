@@ -16,12 +16,14 @@ end
 
 $srcs << "hatstone.c"
 
-append_cppflags("-I$(srcdir)/capstone/include")
-append_cppflags("-I$(srcdir)/capstone/include/capstone")
+$CPPFLAGS << " -I$(srcdir)/capstone/include "
+$CPPFLAGS << " -I$(srcdir)/capstone/include/capstone "
+$CPPFLAGS << " -D CAPSTONE_HAS_ARM "
+$CPPFLAGS << " -D CAPSTONE_HAS_ARM64 "
+$CPPFLAGS << " -D CAPSTONE_HAS_X86 "
+$CPPFLAGS << " -D CAPSTONE_DIET_NO "
+$CPPFLAGS << " -D CAPSTONE_STATIC "
 
-append_cppflags("-D CAPSTONE_HAS_ARM")
-append_cppflags("-D CAPSTONE_HAS_ARM64")
-append_cppflags("-D CAPSTONE_HAS_X86")
-append_cppflags("-D CAPSTONE_DIET_NO")
+$CFLAGS << " -fvisibility=hidden "
 
 create_makefile('hatstone')
